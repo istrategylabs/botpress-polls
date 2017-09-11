@@ -17,6 +17,28 @@ module.exports = {
     // Your module's been loaded by Botpress.
     // Serve your APIs here, execute logic, etc.
 
+    var router = bp.getRouter('botpress-polls', { auth: false })
+
+    // Will be exposed at: http://localhost:3000/api/botpress-polls/ping
+    let data = {
+      hashtag: '#music',
+      options: [
+        {
+          name: 'Achy Breaky Heart',
+          count: 43
+        },
+        {
+          name: 'Achy Breaky Heart',
+          count: 43
+        },
+        {
+          name: 'Achy Breaky Heart',
+          count: 43
+        }
+      ]
+    }
+    router.get('/results', (req, res, next) => res.send({ data: data }))
+
     const config = await configurator.loadAll()
     // Do fancy stuff here :)
 
