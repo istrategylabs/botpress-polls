@@ -1,3 +1,5 @@
+const polls = require('./polls.js')
+
 /*
   Botpress module template. This is your module's entry point.
   Please have a look at the docs for more information about config, init and ready.
@@ -20,7 +22,7 @@ module.exports = {
     var router = bp.getRouter('botpress-polls', { auth: false })
 
     // Will be exposed at: http://localhost:3000/api/botpress-polls/results
-    let polls = [
+    let pollList = [
       {
         hashtag: '#music',
         options: [
@@ -40,8 +42,14 @@ module.exports = {
       }
     ]
     router.get('/results', (req, res) => {
+      // get items from db
+      // then loop through them and create pollItems
+      // then update the poll item options counts
+      // then send api result
+      let pollList = polls.getPolls(bp)
+      console.log(pollList)
       res.send({
-        polls
+        polls: pollList,
       })
     })
 
