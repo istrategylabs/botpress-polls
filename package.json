@@ -4,7 +4,7 @@
   "description": "",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "botpress-polls",
+    "menuText": "Poll Results",
     "menuIcon": "view_module",
     "webBundle": "bin/web.bundle.js"
   },

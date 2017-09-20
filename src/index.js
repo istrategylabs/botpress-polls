@@ -19,25 +19,31 @@ module.exports = {
 
     var router = bp.getRouter('botpress-polls', { auth: false })
 
-    // Will be exposed at: http://localhost:3000/api/botpress-polls/ping
-    let data = {
-      hashtag: '#music',
-      options: [
-        {
-          name: 'Achy Breaky Heart',
-          count: 43
-        },
-        {
-          name: 'Achy Breaky Heart',
-          count: 43
-        },
-        {
-          name: 'Achy Breaky Heart',
-          count: 43
-        }
-      ]
-    }
-    router.get('/results', (req, res, next) => res.send({ data: data }))
+    // Will be exposed at: http://localhost:3000/api/botpress-polls/results
+    let polls = [
+      {
+        hashtag: '#music',
+        options: [
+          {
+            name: 'Achy Breaky Heart',
+            count: 49
+          },
+          {
+            name: 'Sussudio',
+            count: 22
+          },
+          {
+            name: 'Miracles',
+            count: 11
+          }
+        ]
+      }
+    ]
+    router.get('/results', (req, res) => {
+      res.send({
+        polls
+      })
+    })
 
     const config = await configurator.loadAll()
     // Do fancy stuff here :)
