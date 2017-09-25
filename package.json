@@ -42,7 +42,9 @@
     "webpack": "^1.13.3"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
     "redis": "^2.8.0"
   }
 }

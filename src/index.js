@@ -1,4 +1,7 @@
-const polls = require('./polls.js')
+const moment = require('moment-timezone')
+const redis = require('redis')
+
+const cms = require('./cms.js')
 
 /*
   Botpress module template. This is your module's entry point.
@@ -22,34 +25,33 @@ module.exports = {
     var router = bp.getRouter('botpress-polls', { auth: false })
 
     // Will be exposed at: http://localhost:3000/api/botpress-polls/results
-    let pollList = [
-      {
-        hashtag: '#music',
-        options: [
-          {
-            name: 'Achy Breaky Heart',
-            count: 49
-          },
-          {
-            name: 'Sussudio',
-            count: 22
-          },
-          {
-            name: 'Miracles',
-            count: 11
-          }
-        ]
+
+    async function getPolls() {
+      let client = redis.createClient(process.env.REDIS_URL)
+      let todaysDate = moment.tz(new Date(), 'America/New_York')
+      let pollList = []
+
+      let items = await cms.getContent(bp, 'polls')
+      for (let i = 0; i < items.length; i++) {
+        let poll = {
+          hashtag: items[i].data.code,
+          options: []
+        }
+        for (let j = 0; j < 3; j++) {
+          let count = await client.getAsync(`count:${items[i].data.code}-${todaysDate.format('YYYYMMDD')}:${j + 1}`) || 0
+          poll.options.push({ name: items[i]['data'][`option${j + 1}`], count: count })
+        }
+        pollList.push(poll)
       }
-    ]
+      client.quit()
+      return pollList
+    }
+
     router.get('/results', (req, res) => {
-      // get items from db
-      // then loop through them and create pollItems
-      // then update the poll item options counts
-      // then send api result
-      let pollList = polls.getPolls(bp)
-      console.log(pollList)
-      res.send({
-        polls: pollList,
+      getPolls().then((pollList) => {
+        res.send({
+          polls: pollList,
+        })
       })
     })
 
