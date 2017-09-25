@@ -1,3 +1,6 @@
+const moment = require('moment-timezone')
+const redis = require('redis')
+
 const cms = require('./cms.js')
 
 /*
@@ -23,13 +26,11 @@ module.exports = {
 
     // Will be exposed at: http://localhost:3000/api/botpress-polls/results
 
-    // Get all polls from db
-    // then loop through them and create objects
-    // then get results from redis add to objects
-    // then add them to poll objects and return list of polls
-
     async function getPolls() {
+      let client = redis.createClient(process.env.REDIS_URL)
+      let todaysDate = moment.tz(new Date(), 'America/New_York')
       let pollList = []
+
       let items = await cms.getContent(bp, 'polls')
       for (let i = 0; i < items.length; i++) {
         let poll = {
@@ -37,34 +38,14 @@ module.exports = {
           options: []
         }
         for (let j = 0; j < 3; j++) {
-          poll.options.push({ name: items[i]['data'][`option${j+1}`], count: 0 })
+          let count = await client.getAsync(`count:${items[i].data.code}-${todaysDate.format('YYYYMMDD')}:${j + 1}`) || 0
+          poll.options.push({ name: items[i]['data'][`option${j + 1}`], count: count })
         }
         pollList.push(poll)
       }
+      client.quit()
       return pollList
     }
-
-    /*
-    let pollList = [
-      {
-        hashtag: '#music',
-        options: [
-          {
-            name: 'Achy Breaky Heart',
-            count: 49
-          },
-          {
-            name: 'Sussudio',
-            count: 22
-          },
-          {
-            name: 'Miracles',
-            count: 11
-          }
-        ]
-      }
-    ]
-    */
 
     router.get('/results', (req, res) => {
       getPolls().then((pollList) => {
