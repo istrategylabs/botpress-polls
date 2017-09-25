@@ -1,4 +1,4 @@
-const polls = require('./polls.js')
+const cms = require('./cms.js')
 
 /*
   Botpress module template. This is your module's entry point.
@@ -22,6 +22,29 @@ module.exports = {
     var router = bp.getRouter('botpress-polls', { auth: false })
 
     // Will be exposed at: http://localhost:3000/api/botpress-polls/results
+
+    // Get all polls from db
+    // then loop through them and create objects
+    // then get results from redis add to objects
+    // then add them to poll objects and return list of polls
+
+    async function getPolls() {
+      let pollList = []
+      let items = await cms.getContent(bp, 'polls')
+      for (let i = 0; i < items.length; i++) {
+        let poll = {
+          hashtag: items[i].data.code,
+          options: []
+        }
+        for (let j = 0; j < 3; j++) {
+          poll.options.push({ name: items[i]['data'][`option${j+1}`], count: 0 })
+        }
+        pollList.push(poll)
+      }
+      return pollList
+    }
+
+    /*
     let pollList = [
       {
         hashtag: '#music',
@@ -41,15 +64,13 @@ module.exports = {
         ]
       }
     ]
+    */
+
     router.get('/results', (req, res) => {
-      // get items from db
-      // then loop through them and create pollItems
-      // then update the poll item options counts
-      // then send api result
-      let pollList = polls.getPolls(bp)
-      console.log(pollList)
-      res.send({
-        polls: pollList,
+      getPolls().then((pollList) => {
+        res.send({
+          polls: pollList,
+        })
       })
     })
 

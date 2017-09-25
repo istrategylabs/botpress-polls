@@ -2,12 +2,38 @@ const moment = require('moment')
 const redis = require('redis')
 
 
-// get items from db
-// then loop through them and create pollItems
-// then update the poll item options counts
-// then return the list
+// PROMISE: allPolls
+//   Get all active polls (and results?) from redis
+//   then loop through them and create objects
+//   then get info about polls from db and add to objects
+//   then add them to poll objects and return list of polls
 
-// getPolls.then()
+
+/*
+function itemsToPolls(items) {
+  return new Promise((resolve, reject) => {
+    // converts items returned into poll objects
+    return [1, 2, 3]
+  })
+}
+
+function addResults(items) {
+  return new Promise((resolve, reject) => {
+    // adds results from redis to poll objects
+    return [3, 2, 1]
+  })
+}
+
+
+function allPolls(bp) {
+  var pollList = []
+  return bp.contentManager.listCategoryItems('polls').then(itemsToPolls).then(addResults)
+}*/
+
+
+
+
+
 
 
 function getPolls(bp) {
@@ -58,7 +84,9 @@ function getCount (bp, pollID, callback) {
   })
 }
 
+
 module.exports = {
-  getCount,
-  getPolls,
+  allPolls,
+  //getCount,
+  //getPolls,
 }
